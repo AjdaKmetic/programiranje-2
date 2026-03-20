@@ -6,20 +6,77 @@ use core::panic;
 
 /// Napišite funkcijo `fib`, ki sprejme začetna člena fibbonacijevega zaporedja, število `n` in vrne `n`-ti člen zaporedja
 
+/* moja koda
 fn fib(a0: u32, a1: u32, n: u32) -> u32 {
-    panic!("Not implemented");
+    let mut previous = a0;
+    let mut current = a1;
+    let mut counter = 1;
+
+    while counter < n {
+        let next = previous + current;
+        previous = current;
+        current = next;
+        counter += 1;
+    }
+    current
+}
+*/
+
+fn fib(a0: u32, a1: u32, n: u32) -> u32 {
+    if n == 0 {
+        return a0;
+    } else if n == 1 {
+        return a1;
+    } else {
+        return fib(a1, a0 + a1, n-1);
+    }
 }
 
 /// ------------------------------------------------------------------------------------------------
 
 /// Napišite funkcijo `je_prestopno`, ki za podano leto preveri, ali je prestopno
 
+/* moja koda
+fn je_prestopno(n: u32) -> bool {       // da dela za preteklost, moramo za leto vzeti i32
+    if n % 400 == 0 {
+        return true
+    } else if n % 100 == 0 {
+        return false
+    } else if n % 4 == 0 {
+        return true
+    } else {
+        return false
+    }
+}
+*/
+
+fn je_prestopno(leto: u32) -> bool { 
+    return (leto % 4 == 0 && leto % 100 != 0) || (leto % 400 == 0)
+}
+
 /// ------------------------------------------------------------------------------------------------
 
 /// Napišite funkcijo `je_veljaven_datum(datum: Date) -> bool`, ki preveri, ali je datum veljaven
 
 // Dan, mesec, leto
-type Date = (u32, u32, u32);
+type Date = (u32, u32, u32); // za leto so vzeli samo pozitivna števila
+
+fn je_veljaven_datum(datum: Date) -> bool {
+    let (dan, mesec, leto) = datum;
+
+    match mesec {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => return 31 >= dan && dan >= 1,
+        4 | 6 | 9 | 11 => return 30 >= dan && dan >= 1,
+        2 => {
+            if je_prestopno(leto) {
+                return 29 >= dan && dan >= 1
+            } else { 
+                return 28 >= dan && dan >= 1 
+            }
+        }
+        _ => return false
+    };
+}
 
 /// ------------------------------------------------------------------------------------------------
 
@@ -27,8 +84,23 @@ type Date = (u32, u32, u32);
 /// Iteracijsko funkcijo zaporedoma uporablja, dokler za rezultat ne velja zaustavitveni pogoj, in vrne prvi rezultat, ki zadošča zaustavitvenemu pogoju.
 
 fn iteracija(mut start: u32, fun: fn(u32) -> u32, cond: fn(u32) -> bool) -> u32 {
-    panic!("Not implemented");
+    while !cond(start) {
+        start = fun(start);
+    }
+
+    start
 }
+
+/* profesorjeva koda
+fn iteracija(mut start: u32, fun: fn(u32) -> u32, cond: fn(u32) -> bool) -> u32 {
+   loop {
+        if cond(start) {
+            return start;
+        }
+        start = fun(start);
+   } 
+}
+*/
 
 /// ------------------------------------------------------------------------------------------------
 
@@ -105,4 +177,15 @@ fn pyramid(n: u32) {
 /// A B C D C B A
 /// Napišite funkcijo `fn selection_sort(mut arr: [u32])`, ki uredi tabelo `arr` z uporabo algoritma urejanja z izbiranjem
 
-fn main() {}
+fn main() {
+    let result = fib(0, 1, 15);
+    println!("Result is {result}");
+
+    let leto = 2100;
+    let ali_je_prestopno = je_prestopno(leto);
+    println!("{leto} {ali_je_prestopno}");
+
+    let datum: Date = (67, 9, 2001);
+    let ali_je_veljaven = je_veljaven_datum(datum);
+    println!("{datum:?} {ali_je_veljaven}");            // ali println!("{:?} {}", datum, ali_je_veljaven);, ker je datum tuple
+}
