@@ -4,9 +4,11 @@
         "03-uvod-v-rust/vaje/Cargo.toml",
         "04-lastnistvo/vaje/Cargo.toml",
         "05-podatkovni-tipi/predavanja/Cargo.toml",
+        "05-podatkovni-tipi/vaje/Cargo.toml",
         "06-polimorfizem/predavanja/generiki/Cargo.toml",
         "06-polimorfizem/predavanja/znacilnosti/Cargo.toml",
         "06-polimorfizem/predavanja/zivljenjskedobe/Cargo.toml",
+        "06-polimorfizem/vaje/Cargo.toml",
         "07-funkcijsko-programiranje/predavanja/Cargo.toml",
         "07-funkcijsko-programiranje/vaje/Cargo.toml",
         "08-pametni-kazalci/predavanja/Cargo.toml",
@@ -14,3 +16,4 @@
         "10-asinhrono-programiranje/predavanja/Cargo.toml",
     ]
 }
+

@@ -80,14 +80,109 @@ enum Izraz { // enumi živijo na skladu
 }
 
 impl Izraz {
-    fn konst(a: u32) -> Box<Izraz> {
-        Box::new(Izraz::Konstanta(a))
+    fn konst(a: u32) -> Self {
+        Izraz::Konstanta(a)
     }
+
+    fn op(left: Izraz, op: BinOperacija, right: Izraz) -> Self {
+        Izraz::Operacija(Box::new(left), op, Box::new(right))
+    }
+
+    fn eval(&self) -> u32 {
+        match self {
+            Izraz::Konstanta(v) => *v,
+            Izraz::Operacija(
+                l,
+                bin_operacija, 
+                r) => {
+                    let lv = l.eval();
+                    let rv = r.eval();
+                    match bin_operacija {
+                        BinOperacija::Plus => lv + rv,
+                        BinOperacija::Minus => lv - rv,
+                        BinOperacija::Times => lv * rv,
+                    }
+                }
+        }
+    }
+
+    fn collect(&self) -> u32 { // vrne število konstant v izrazu
+        match self {
+            Izraz::Konstanta(_) => 1,
+            Izraz::Operacija(l, 
+                _, 
+                r) => {
+                    let lc = l.collect(); // lc ... left collect
+                    let rc = r.collect();
+                    lc + rc
+                }
+        }
+    }
+
+    fn izpis(&self) -> String {
+        match self {
+            Izraz::Konstanta(v) => v.to_string(),
+            Izraz::Operacija(
+                l, 
+                bin_operacija, 
+                r) => {
+                    let li = l.izpis();
+                    let ri = r.izpis();
+                    match bin_operacija {
+                        BinOperacija::Plus => format!("({} + {})", li, ri),
+                        // li + &String::from(" + ") + &ri ... li tu spreminjamo, zato si moramo sposoditi
+                        BinOperacija::Minus => format!("({} - {})", li, ri),
+                        BinOperacija::Times => format!("({} * {})", li, ri),
+                    }
+                }
+        }
+    }
+
+/* lepši zapis izpisa:
+    fn izpis(&self) -> String {
+        match self {
+            Izraz::Konstanta(v) => v.to_string(),
+            Izraz::Operacija(
+                l, 
+                bin_operacija, 
+                r) => {
+                    let li = l.izpis();
+                    let ri = r.izpis();
+                    let opi = match bin_operacija {
+                        BinOperacija::Plus => "+",
+                        BinOperacija::Minus => "-",
+                        BinOperacija::Times => "*",
+                    };
+                    format!("({} {} {})", li, opi, ri)
+                }
+        }
+*/
+    
 }
 
 // oklepaji pridejo sami od sebe, jih ne rabimo (struktura drevesa določa oklepaje)
 
 fn main() {
+    let konst1 = Izraz::Konstanta(3);
+    let konst2 = Izraz::Konstanta(4);
+    let vsota = Izraz::Operacija(
+        Box::new(konst1),
+        BinOperacija::Plus,
+        Box::new(konst2));
+    // (1 + 2) * 3
+    let izraz = Izraz::op(
+        Izraz::op(
+            Izraz::konst(1),
+            BinOperacija::Plus,
+            Izraz::konst(2)),
+        BinOperacija::Times,
+        Izraz::konst(3));
+    println!("{}", izraz.izpis());
+}
+
+// &str - živi na stacku in ima točno določeno dolžino
+
+/* kaj smo deli v main: 
     let mut an = AritmeticnoZaporedje::new(1, 1);
     let mut bn = AritmeticnoZaporedje::new(5,4);
     let mut cn = an.vsota(&bn);
@@ -102,5 +197,4 @@ fn main() {
             Box::new(Izraz::Konstanta(2)),
         )),
     );
-}
-
+*/
