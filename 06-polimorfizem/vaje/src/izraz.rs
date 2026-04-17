@@ -1,7 +1,7 @@
 use std::ops::*;
 use std::fmt::*;
 
-enum BinOperacija {
+pub enum BinOperacija {
     Plus,
     Minus,
     Times,
@@ -14,19 +14,19 @@ enum Izraz<T> { // enumi živijo na skladu
 }
 
 impl<T> Izraz<T> {
-    fn konst(a: T) -> Self {
+    pub fn konst(a: T) -> Self {
         Izraz::Konstanta(a)
     }
 
-    fn spr(ime: &str) -> Self {
+    pub fn spr(ime: &str) -> Self {
         Izraz::Spremenljivka(ime.to_string()) // ime se skopira in da na kopico, imamo kazalec na kopico?
     }
 
-    fn op(left: Izraz<T>, op: BinOperacija, right: Izraz<T>) -> Self {
+    pub fn op(left: Izraz<T>, op: BinOperacija, right: Izraz<T>) -> Self {
         Izraz::Operacija(Box::new(left), op, Box::new(right))
     }
 
-    fn collect(&self) -> u32 { // vrne število konstant v izrazu
+    pub fn collect(&self) -> u32 { // vrne število konstant v izrazu
         match self {
             Izraz::Konstanta(_) => 1,
             Izraz::Spremenljivka(_) => 1,
@@ -43,16 +43,16 @@ impl<T> Izraz<T>
 where
     T: Add<Output = T> + Sub<Output = T> + Mul<Output = T> + Clone //????
 {
-    fn eval(&self) -> T {
+    pub fn eval(&self, lookup: &impl Fn(&str) -> T) -> T {
         match self {
             Izraz::Konstanta(v) => v.clone(), // razlika med copy in clone? copy se dogaja na stacku; stvari, ki pa živijo na kopici pa se klonirajo (prekopiramo iz kopice nekam drugam na kopico in podamo kazalec, kam smo sklonirali)
-            Izraz::Spremenljivka(_) => todo!(),
+            Izraz::Spremenljivka(ime) => lookup(ime),
             Izraz::Operacija(
                 l,
                 bin_operacija, 
                 r) => {
-                    let lv = l.eval();
-                    let rv = r.eval();
+                    let lv = l.eval(lookup);
+                    let rv = r.eval(lookup);
                     match bin_operacija {
                         BinOperacija::Plus => lv + rv,
                         BinOperacija::Minus => lv - rv,
@@ -64,7 +64,7 @@ where
 }
 
 impl<T: Display> Izraz<T> {
-    fn izpis(&self) -> String {
+    pub fn izpis(&self) -> String {
         match self {
             Izraz::Konstanta(v) => v.to_string(),
             Izraz::Spremenljivka(s) => s.to_string(),
